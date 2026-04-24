@@ -1,0 +1,132 @@
+﻿
+[ERROR] COMPILATION 
+ERROR : 
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/JwtUtils.
+java:[41,20] cannot 
+find symbol
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/JwtUtils.
+java:[47,17] cannot 
+find symbol
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/SecurityC
+onfig.java:[33,50] 
+constructor DaoAuthentic
+ationProvider in class o
+rg.springframework.secur
+ity.authentication.dao.D
+aoAuthenticationProvider
+ cannot be applied to 
+given types;
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/SecurityC
+onfig.java:[35,21] 
+cannot find symbol
+[ERROR] Failed to 
+execute goal org.apache.
+maven.plugins:maven-comp
+iler-plugin:3.14.1:compi
+le (default-compile) on 
+project backend: 
+Compilation failure: 
+Compilation failure: 
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/JwtUtils.
+java:[41,20] cannot 
+find symbol
+[ERROR]   symbol:   
+method parserBuilder()
+[ERROR]   location: 
+class 
+io.jsonwebtoken.Jwts
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/JwtUtils.
+java:[47,17] cannot 
+find symbol
+[ERROR]   symbol:   
+method parserBuilder()
+[ERROR]   location: 
+class 
+io.jsonwebtoken.Jwts
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/SecurityC
+onfig.java:[33,50] 
+constructor DaoAuthentic
+ationProvider in class o
+rg.springframework.secur
+ity.authentication.dao.D
+aoAuthenticationProvider
+ cannot be applied to 
+given types;
+[ERROR]   required: org.
+springframework.security
+.core.userdetails.UserDe
+tailsService
+[ERROR]   found:    no 
+arguments
+[ERROR]   reason: 
+actual and formal 
+argument lists differ 
+in length
+[ERROR] /C:/Users/suvin/
+OneDrive/Documents/FSDA/
+project/backend/src/main
+/java/com/taskmanager/ba
+ckend/security/SecurityC
+onfig.java:[35,21] 
+cannot find symbol
+[ERROR]   symbol:   
+method setUserDetailsSer
+vice(com.taskmanager.bac
+kend.security.UserDetail
+sServiceImpl)
+[ERROR]   location: 
+variable authProvider 
+of type org.springframew
+ork.security.authenticat
+ion.dao.DaoAuthenticatio
+nProvider
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full 
+stack trace of the 
+errors, re-run Maven 
+with the -e switch.
+[ERROR] Re-run Maven 
+using the -X switch to 
+enable full debug 
+logging.
+[ERROR] 
+[ERROR] For more 
+information about the 
+errors and possible 
+solutions, please read 
+the following articles:
+[ERROR] [Help 1] http://
+cwiki.apache.org/conflue
+nce/display/MAVEN/MojoFa
+ilureException
+
+
