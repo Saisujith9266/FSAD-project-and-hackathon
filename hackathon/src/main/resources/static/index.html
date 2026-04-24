@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClaimSafe — Insurance Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy2: #152338;
+    --blue: #1a6fc4;
+    --blue-light: #2483e2;
+    --teal: #00b4a6;
+    --gold: #e8b84b;
+    --cream: #faf7f2;
+    --white: #ffffff;
+    --gray50: #f6f8fa;
+    --gray100: #eaeef2;
+    --gray300: #b0b8c4;
+    --gray500: #6b7685;
+    --gray700: #3b4556;
+    --danger: #e05252;
+    --success: #28a06a;
+    --warn: #e8861a;
+    --radius: 14px;
+    --shadow: 0 4px 32px rgba(13,27,42,.13);
+    --shadow-sm: 0 2px 10px rgba(13,27,42,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+  header {
+    background: var(--navy); padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,.25);
+  }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); letter-spacing: -.3px; display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--blue), var(--teal)); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .logo span { color: var(--gold); }
+  nav { display: flex; gap: 4px; }
+  nav button { background: none; border: none; cursor: pointer; color: var(--gray300); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 8px 18px; border-radius: 8px; transition: all .2s; }
+  nav button:hover { background: rgba(255,255,255,.08); color: #fff; }
+  nav button.active { background: rgba(26,111,196,.25); color: var(--blue-light); }
+  .user-chip { display: flex; align-items: center; gap: 9px; color: var(--gray300); font-size: 14px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--teal)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 13px; }
+
+  .page { display: none; padding: 40px; max-width: 1100px; margin: 0 auto; animation: fadeIn .3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--navy); line-height: 1.2; }
+  .page-header p { color: var(--gray500); margin-top: 6px; font-size: 15px; }
+  .breadcrumb { font-size: 13px; color: var(--gray500); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb span { color: var(--blue); cursor: pointer; }
+  .breadcrumb span:hover { text-decoration: underline; }
+
+  .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--gray100); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .form-section { padding: 32px; }
+  .form-section h2 { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 22px; display: flex; align-items: center; gap: 9px; }
+  .step-badge { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--gray700); margin-bottom: 7px; }
+  label .req { color: var(--danger); }
+
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray100); border-radius: 9px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--navy); background: var(--gray50);
+    transition: border .2s, box-shadow .2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,196,.12); background: #fff; }
+  textarea { resize: vertical; min-height: 110px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7685' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+
+  .policy-card-select { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .policy-option { border: 2px solid var(--gray100); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .2s; background: var(--gray50); }
+  .policy-option:hover { border-color: var(--blue-light); background: #f0f6ff; }
+  .policy-option.selected { border-color: var(--blue); background: #eef5ff; }
+  .pol-type { font-size: 11px; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: .6px; }
+  .pol-num { font-size: 14px; font-weight: 600; color: var(--navy); margin: 3px 0; }
+  .pol-cov { font-size: 12px; color: var(--gray500); }
+
+  .upload-zone { border: 2px dashed var(--gray300); border-radius: 10px; padding: 28px; text-align: center; cursor: pointer; transition: all .2s; background: var(--gray50); }
+  .upload-zone:hover { border-color: var(--blue); background: #f0f6ff; }
+  .upload-zone .upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .upload-zone p { font-size: 13px; color: var(--gray500); }
+  .upload-zone strong { color: var(--blue); }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: all .2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--blue), #1058a8); color: #fff; box-shadow: 0 4px 14px rgba(26,111,196,.35); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,111,196,.45); }
+  .btn-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--gray100); }
+  .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+  .btn-ghost { background: none; color: var(--blue); padding: 8px 12px; }
+  .btn-ghost:hover { background: #eef5ff; }
+  .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+  .form-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 20px 32px; border-top: 1px solid var(--gray100); }
+
+  .toast { position: fixed; bottom: 30px; right: 30px; background: var(--navy); color: #fff; padding: 16px 22px; border-radius: 12px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); z-index: 999; transform: translateY(80px); opacity: 0; transition: all .35s cubic-bezier(.34,1.56,.64,1); font-size: 14px; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 20px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; border: 1px solid var(--gray100); box-shadow: var(--shadow-sm); }
+  .stat-label { font-size: 12px; font-weight: 500; color: var(--gray500); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--navy); }
+  .stat-sub { font-size: 12px; color: var(--gray500); margin-top: 4px; }
+  .stat-card.blue .stat-value { color: var(--blue); }
+  .stat-card.teal .stat-value { color: var(--teal); }
+  .stat-card.gold .stat-value { color: var(--gold); }
+
+  .filters-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-chip { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--gray100); background: #fff; cursor: pointer; transition: all .2s; color: var(--gray700); }
+  .filter-chip:hover { border-color: var(--blue); color: var(--blue); }
+  .filter-chip.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .search-box { flex: 1; max-width: 280px; position: relative; }
+  .search-box input { padding-left: 38px; background: #fff; }
+  .search-box::before { content: '🔍'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
+
+  .claims-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .claims-table thead tr { background: var(--gray50); }
+  .claims-table th { padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--gray500); text-transform: uppercase; letter-spacing: .5px; text-align: left; border-bottom: 1px solid var(--gray100); }
+  .claims-table td { padding: 16px 18px; font-size: 14px; border-bottom: 1px solid var(--gray100); vertical-align: middle; }
+  .claims-table tbody tr { cursor: pointer; transition: background .15s; }
+  .claims-table tbody tr:hover { background: #f5f9ff; }
+  .claims-table tbody tr:last-child td { border-bottom: none; }
+
+  .claim-id { font-weight: 600; color: var(--blue); font-family: monospace; font-size: 13px; }
+  .policy-tag { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+  .tag-health { background: #e8f5f0; color: #1a7a52; }
+  .tag-auto { background: #e8f0fa; color: #1a4fa0; }
+  .tag-home { background: #fdf3e3; color: #a06010; }
+  .tag-life { background: #f3e8fd; color: #6a20aa; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge-pending { background: #fff8e6; color: #c47c00; }
+  .badge-approved { background: #e6f7ef; color: var(--success); }
+  .badge-rejected { background: #fdeaea; color: var(--danger); }
+  .badge-review { background: #e8f0fd; color: var(--blue); }
+
+  .amount-cell { font-weight: 600; font-family: 'DM Serif Display', serif; font-size: 16px; }
+
+  .details-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+  .detail-card { padding: 28px 32px; }
+  .detail-section { margin-bottom: 28px; }
+  .detail-section h3 { font-size: 14px; font-weight: 600; color: var(--gray500); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 16px; border-bottom: 1px solid var(--gray100); padding-bottom: 10px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .di-label { font-size: 12px; color: var(--gray500); margin-bottom: 4px; }
+  .di-value { font-size: 15px; font-weight: 500; color: var(--navy); }
+
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--gray100); }
+  .timeline-item { position: relative; margin-bottom: 22px; }
+  .timeline-dot { position: absolute; left: -24px; top: 3px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--white); box-shadow: 0 0 0 2px var(--blue); background: var(--blue); }
+  .timeline-dot.done { background: var(--success); box-shadow: 0 0 0 2px var(--success); }
+  .timeline-dot.pending { background: var(--white); box-shadow: 0 0 0 2px var(--gray300); }
+  .tl-title { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .tl-date { font-size: 12px; color: var(--gray500); margin-top: 2px; }
+  .tl-note { font-size: 13px; color: var(--gray700); margin-top: 4px; }
+
+  .side-card { padding: 24px; }
+  .amount-display { text-align: center; padding: 20px; background: linear-gradient(135deg, #eef5ff, #e8f8f5); border-radius: 10px; margin-bottom: 20px; }
+  .amt-label { font-size: 12px; color: var(--gray500); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .amt-value { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); }
+  .actions-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .doc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .doc-list li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--gray50); border-radius: 8px; font-size: 13px; color: var(--navy); border: 1px solid var(--gray100); }
+  .doc-icon { font-size: 18px; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--gray500); }
+  .empty-state .es-icon { font-size: 48px; margin-bottom: 14px; opacity: .4; }
+  .empty-state p { font-size: 15px; }
+
+  @media (max-width: 768px) {
+    .page { padding: 20px 16px; }
+    header { padding: 0 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .details-layout { grid-template-columns: 1fr; }
+    .policy-card-select { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    Claim<span>Safe</span>
+  </div>
+  <nav>
+    <button class="active" onclick="showPage('submit', this)">Submit Claim</button>
+    <button onclick="showPage('history', this)">Claim History</button>
+  </nav>
+  <div class="user-chip">
+    <div class="avatar">RK</div>
+    Suvin Sai
+  </div>
+</header>
+
+<!-- PAGE 1: SUBMIT CLAIM -->
+<div id="page-submit" class="page active">
+  <div class="page-header">
+    <h1>Submit a New Claim</h1>
+    <p>Complete the form below to file your insurance claim. All fields marked with * are required.</p>
+  </div>
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-section">
+        <h2><span class="step-badge">1</span> Select Your Policy</h2>
+        <div class="form-group">
+          <label>Choose a policy <span class="req">*</span></label>
+          <div class="policy-card-select">
+            <div class="policy-option selected" onclick="selectPolicy(this,'POL-H-44821')">
+              <div class="pol-type">🏥 Health</div>
+              <div class="pol-num">POL-H-44821</div>
+              <div class="pol-cov">Coverage: ₹5,00,000</div>
+            </div>
+            <div class="policy-option" onclick="selectPolicy(this,'POL-A-39204')">
+              <div class="pol-type">🚗 Auto</div>
+              <div class="pol-num">POL-A-39204</div>
+              <div class="pol-cov">Coverage: ₹3,00,000</div>
+            </div>
+            <div class="policy-option" onclick="selectPolicy(this,'POL-HM-17651')">
+              <div class="pol-type">🏠 Home</div>
+              <div class="pol-num">POL-HM-17651</div>
+              <div class="pol-cov">Coverage: ₹15,00,000</div>
+            </div>
+            <div class="policy-option" onclick="selectPolicy(this,'POL-L-29083')">
+              <div class="pol-type">💛 Life</div>
+              <div class="pol-num">POL-L-29083</div>
+              <div class="pol-cov">Coverage: ₹50,00,000</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Claim Type <span class="req">*</span></label>
+          <select id="claimType">
+            <option value="">Select claim type...</option>
+            <option>Hospitalization</option>
+            <option>Surgery</option>
+            <option>Accident / Injury</option>
+            <option>Property Damage</option>
+            <option>Theft / Burglary</option>
+            <option>Natural Disaster</option>
+            <option>Critical Illness</option>
+            <option>Death Benefit</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Incident Date <span class="req">*</span></label>
+          <input type="date" id="incidentDate"/>
+        </div>
+        <div class="form-group">
+          <label>Claim Amount (₹) <span class="req">*</span></label>
+          <input type="number" id="claimAmount" placeholder="e.g. 25000" min="1"/>
+        </div>
+      </div>
+
+      <div class="form-section" style="border-left:1px solid var(--gray100);">
+        <h2><span class="step-badge">2</span> Description &amp; Documents</h2>
+        <div class="form-group">
+          <label>Incident Description <span class="req">*</span></label>
+          <textarea id="claimDesc" placeholder="Describe what happened, when, and how it relates to your policy coverage..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Location of Incident</label>
+          <input type="text" id="location" placeholder="City, State or full address"/>
+        </div>
+        <div class="form-group">
+          <label>Supporting Documents</label>
+          <div class="upload-zone" onclick="simulateUpload()">
+            <div class="upload-icon">📎</div>
+            <p><strong>Click to upload</strong> or drag &amp; drop</p>
+            <p style="margin-top:4px;font-size:12px;">PDF, JPG, PNG — max 10MB each</p>
+          </div>
+          <div id="uploadedFiles" style="margin-top:10px;"></div>
+        </div>
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <input type="text" id="notes" placeholder="Any other relevant information..."/>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="resetForm()">Clear Form</button>
+      <button class="btn btn-primary" onclick="submitClaim()">🚀 Submit Claim</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: CLAIM HISTORY -->
+<div id="page-history" class="page">
+  <div class="page-header">
+    <h1>Claim History</h1>
+    <p>Track and manage all your submitted insurance claims.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Claims</div>
+      <div class="stat-value" id="statTotal">6</div>
+      <div class="stat-sub">All time</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Pending Review</div>
+      <div class="stat-value" id="statPending">2</div>
+      <div class="stat-sub">Awaiting decision</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Approved</div>
+      <div class="stat-value" id="statApproved">3</div>
+      <div class="stat-sub">Claims settled</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-label">Total Settled</div>
+      <div class="stat-value" id="statSettled">₹1.8L</div>
+      <div class="stat-sub">Amount disbursed</div>
+    </div>
+  </div>
+  <div class="filters-bar">
+    <div class="search-box">
+      <input type="text" placeholder="Search claims..." oninput="renderTable()" id="searchInput"/>
+    </div>
+    <button class="filter-chip active" onclick="setFilter('All',this)">All</button>
+    <button class="filter-chip" onclick="setFilter('Pending',this)">Pending</button>
+    <button class="filter-chip" onclick="setFilter('Under Review',this)">Under Review</button>
+    <button class="filter-chip" onclick="setFilter('Approved',this)">Approved</button>
+    <button class="filter-chip" onclick="setFilter('Rejected',this)">Rejected</button>
+  </div>
+  <div class="card">
+    <table class="claims-table">
+      <thead><tr>
+        <th>Claim ID</th><th>Policy</th><th>Type</th><th>Filed On</th><th>Amount</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody id="claimsTableBody"></tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="es-icon">📋</div>
+      <p>No claims found matching your filters.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: CLAIM DETAILS -->
+<div id="page-details" class="page">
+  <div class="page-header">
+    <div class="breadcrumb">
+      <span onclick="showPage('history', document.querySelectorAll('nav button')[1])">← Claim History</span> / Claim Details
+    </div>
+    <h1 id="detailsTitle">Claim Details</h1>
+    <p id="detailsSubtitle" style="color:var(--gray500);margin-top:6px;font-size:15px;"></p>
+  </div>
+  <div class="details-layout">
+    <div>
+      <div class="card detail-card" style="margin-bottom:20px;">
+        <div class="detail-section">
+          <h3>Claim Information</h3>
+          <div class="detail-grid" id="detailsGrid"></div>
+        </div>
+        <div class="detail-section">
+          <h3>Description</h3>
+          <p id="detailsDesc" style="font-size:15px;line-height:1.7;color:var(--gray700);"></p>
+        </div>
+        <div class="detail-section">
+          <h3>Supporting Documents</h3>
+          <ul class="doc-list">
+            <li><span class="doc-icon">📄</span> Hospital_Discharge_Summary.pdf</li>
+            <li><span class="doc-icon">🖼</span> Medical_Bills_Scan.jpg</li>
+            <li><span class="doc-icon">📄</span> Prescription_Copy.pdf</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card side-card" style="margin-bottom:16px;">
+        <div class="amount-display">
+          <div class="amt-label">Claimed Amount</div>
+          <div class="amt-value" id="detailsAmount">₹0</div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:12px;color:var(--gray500);margin-bottom:6px;">Current Status</div>
+          <div id="detailsStatus"></div>
+        </div>
+        <div class="actions-list">
+          <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="alert('Document upload dialog opened.')">📎 Add Documents</button>
+          <button class="btn btn-ghost" style="justify-content:center;" onclick="alert('Adjuster contact: claims@claimsafe.in | 1800-XXX-XXXX')">📞 Contact Adjuster</button>
+        </div>
+      </div>
+      <div class="card side-card">
+        <h3 style="font-size:14px;font-weight:600;color:var(--gray500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:18px;">Claim Timeline</h3>
+        <div class="timeline" id="detailsTimeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <div>
+    <strong id="toastTitle">Done!</strong>
+    <div id="toastMsg" style="font-size:12px;opacity:.75;margin-top:2px;"></div>
+  </div>
+</div>
+
+<script>
+// ─── Config ────────────────────────────────────────────────────────────────
+const API = '/api';   // Spring Boot runs on same origin; change to http://localhost:8080/api if serving separately
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let activeFilter  = 'All';
+let selectedPolicy = 'POL-H-44821';
+let cachedClaims  = [];
+
+// ─── Utilities ─────────────────────────────────────────────────────────────
+const typeClasses   = { Health:'tag-health', Auto:'tag-auto', Home:'tag-home', Life:'tag-life' };
+const statusClasses = { Pending:'badge-pending', Approved:'badge-approved', Rejected:'badge-rejected', 'Under Review':'badge-review' };
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function fmtAmount(n) {
+  return n >= 100000 ? '₹' + (n/100000).toFixed(1) + 'L' : '₹' + (n/1000).toFixed(0) + 'K';
+}
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) },
+    ...opts,
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || 'API error');
+  return json.data;
+}
+
+// ─── Navigation ────────────────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'history') loadHistory();
+}
+
+// ─── Policy selection ──────────────────────────────────────────────────────
+function selectPolicy(el, val) {
+  document.querySelectorAll('.policy-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPolicy = val;
+}
+
+// ─── File upload (real multipart) ──────────────────────────────────────────
+function simulateUpload() {
+  // Triggers browser file picker; actual upload happens after claim is submitted
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.accept = '.pdf,.jpg,.jpeg,.png,.zip';
+  input.onchange = () => {
+    Array.from(input.files).forEach(file => {
+      const div = document.getElementById('uploadedFiles');
+      const item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--gray50);border:1px solid var(--gray100);border-radius:8px;margin-bottom:6px;font-size:13px;';
+      item.innerHTML = `<span>📎</span><span style="flex:1">${file.name}</span><span style="color:var(--gray500);font-size:11px;">${(file.size/1024).toFixed(1)} KB</span>`;
+      item.dataset.file = file.name;
+      div._pendingFiles = div._pendingFiles || [];
+      div._pendingFiles.push(file);
+      div.appendChild(item);
+    });
+  };
+  input.click();
+}
+
+// ─── Submit claim ──────────────────────────────────────────────────────────
+async function submitClaim() {
+  const type   = document.getElementById('claimType').value;
+  const date   = document.getElementById('incidentDate').value;
+  const amount = document.getElementById('claimAmount').value;
+  const desc   = document.getElementById('claimDesc').value;
+
+  if (!type || !date || !amount || !desc) {
+    showToast('⚠️', 'Missing Fields', 'Please fill in all required fields before submitting.');
+    return;
+  }
+
+  try {
+    const payload = {
+      policyNumber:    selectedPolicy,
+      claimType:       type,
+      incidentDate:    date,
+      claimAmount:     parseInt(amount),
+      description:     desc,
+      location:        document.getElementById('location').value || '',
+      additionalNotes: document.getElementById('notes').value || '',
+    };
+
+    const created = await apiFetch('/claims', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    // Upload any pending files
+    const uploadedDiv = document.getElementById('uploadedFiles');
+    const pendingFiles = uploadedDiv._pendingFiles || [];
+    if (pendingFiles.length > 0) {
+      const fd = new FormData();
+      pendingFiles.forEach(f => fd.append('files', f));
+      await fetch(`${API}/claims/${created.claimId}/docs`, { method: 'POST', body: fd });
+    }
+
+    showToast('✅', 'Claim Submitted!', `Your claim ${created.claimId} has been received and is under review.`);
+    resetForm();
+    await loadStats();
+    setTimeout(() => showPage('history', document.querySelectorAll('nav button')[1]), 1600);
+  } catch (err) {
+    showToast('❌', 'Submission Failed', err.message);
+  }
+}
+
+function resetForm() {
+  ['claimType','incidentDate','claimAmount','claimDesc','location','notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const div = document.getElementById('uploadedFiles');
+  div.innerHTML = '';
+  div._pendingFiles = [];
+}
+
+// ─── Toast ─────────────────────────────────────────────────────────────────
+function showToast(icon, title, msg) {
+  const t = document.getElementById('toast');
+  document.querySelector('.toast-icon').textContent = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent   = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ─── Stats ─────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const stats = await apiFetch('/claims/stats');
+    document.getElementById('statTotal').textContent    = stats.totalClaims;
+    document.getElementById('statPending').textContent  = stats.pendingClaims;
+    document.getElementById('statApproved').textContent = stats.approvedClaims;
+    document.getElementById('statSettled').textContent  = fmtAmount(stats.totalSettledAmount);
+  } catch (e) { console.error('Stats error', e); }
+}
+
+// ─── Claim History ─────────────────────────────────────────────────────────
+async function loadHistory() {
+  await loadStats();
+  await renderTable();
+}
+
+async function renderTable() {
+  const search = (document.getElementById('searchInput').value || '').trim();
+  const params = new URLSearchParams();
+  if (activeFilter !== 'All') params.set('status', activeFilter);
+  if (search) params.set('search', search);
+
+  try {
+    cachedClaims = await apiFetch('/claims?' + params.toString());
+  } catch (e) {
+    console.error('Failed to load claims', e);
+    return;
+  }
+
+  const body  = document.getElementById('claimsTableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (!cachedClaims.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = cachedClaims.map(c => `
+    <tr onclick="openDetails('${c.claimId}')">
+      <td><span class="claim-id">${c.claimId}</span></td>
+      <td>
+        <span class="policy-tag ${typeClasses[c.policyType]||'tag-health'}">${c.policyType}</span>
+        <div style="font-size:12px;color:var(--gray500);margin-top:3px;">${c.policyNumber}</div>
+      </td>
+      <td>${c.claimType}</td>
+      <td style="color:var(--gray500);">${formatDate(c.incidentDate)}</td>
+      <td class="amount-cell">₹${c.claimAmount.toLocaleString('en-IN')}</td>
+      <td><span class="badge ${statusClasses[c.status]||'badge-pending'}">${c.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openDetails('${c.claimId}')">View →</button></td>
+    </tr>`).join('');
+}
+
+function setFilter(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+// ─── Claim Details ─────────────────────────────────────────────────────────
+async function openDetails(claimId) {
+  let c;
+  try {
+    c = await apiFetch('/claims/' + claimId);
+  } catch (e) {
+    showToast('❌', 'Error', 'Could not load claim details.');
+    return;
+  }
+
+  document.getElementById('detailsTitle').textContent    = 'Claim #' + c.claimId;
+  document.getElementById('detailsSubtitle').textContent = c.policyType + ' Insurance · ' + c.policyNumber;
+  document.getElementById('detailsDesc').textContent     = c.description;
+  document.getElementById('detailsAmount').textContent   = '₹' + c.claimAmount.toLocaleString('en-IN');
+  document.getElementById('detailsStatus').innerHTML     =
+    `<span class="badge ${statusClasses[c.status]||'badge-pending'}" style="font-size:14px;padding:6px 14px;">${c.status}</span>`;
+
+  document.getElementById('detailsGrid').innerHTML = `
+    <div><div class="di-label">Claim ID</div><div class="di-value">${c.claimId}</div></div>
+    <div><div class="di-label">Policy Number</div><div class="di-value">${c.policyNumber}</div></div>
+    <div><div class="di-label">Claim Type</div><div class="di-value">${c.claimType}</div></div>
+    <div><div class="di-label">Incident Date</div><div class="di-value">${formatDate(c.incidentDate)}</div></div>
+    <div><div class="di-label">Filing Date</div><div class="di-value">${formatDate(c.filedAt)}</div></div>
+    <div><div class="di-label">Location</div><div class="di-value">${c.location || '—'}</div></div>`;
+
+  // Documents
+  if (c.documents && c.documents.length) {
+    const icons = { 'application/pdf':'📄', 'image/jpeg':'🖼', 'image/png':'🖼' };
+    document.querySelector('.doc-list').innerHTML = c.documents.map(d =>
+      `<li><span class="doc-icon">${icons[d.contentType]||'📎'}</span>${d.fileName}</li>`
+    ).join('');
+  }
+
+  // Timeline
+  const tlMap = {
+    Pending: [
+      {title:'Claim Filed',        date:formatDate(c.filedAt), note:'Claim received and logged.',               done:true},
+      {title:'Document Verification', date:'In Progress',       note:'Our team is reviewing your documents.',   done:false, active:true},
+      {title:'Adjuster Review',    date:'Pending',              note:'',                                        done:false},
+      {title:'Final Decision',     date:'Pending',              note:'',                                        done:false},
+    ],
+    'Under Review': [
+      {title:'Claim Filed',        date:formatDate(c.filedAt), note:'Received and acknowledged.',               done:true},
+      {title:'Documents Verified', date:'Completed',            note:'All documents validated.',                done:true},
+      {title:'Under Review',       date:'In Progress',          note:'Adjuster is assessing the claim.',        done:false, active:true},
+      {title:'Final Decision',     date:'Pending',              note:'',                                        done:false},
+    ],
+    Approved: [
+      {title:'Claim Filed',        date:formatDate(c.filedAt), note:'',                                         done:true},
+      {title:'Documents Verified', date:'Completed',            note:'',                                        done:true},
+      {title:'Adjuster Review',    date:'Completed',            note:'Claim assessed as valid.',                done:true},
+      {title:'Approved & Disbursed',date:'Settled',             note:`₹${c.claimAmount.toLocaleString('en-IN')} disbursed to your account.`, done:true},
+    ],
+    Rejected: [
+      {title:'Claim Filed',        date:formatDate(c.filedAt), note:'',                                         done:true},
+      {title:'Documents Verified', date:'Completed',            note:'',                                        done:true},
+      {title:'Adjuster Review',    date:'Completed',            note:'Issues found during review.',             done:true},
+      {title:'Rejected',           date:'Closed',               note:'Contact support to raise an appeal.',    done:true},
+    ],
+  };
+
+  const tl = tlMap[c.status] || tlMap['Pending'];
+  document.getElementById('detailsTimeline').innerHTML = tl.map(item => `
+    <div class="timeline-item">
+      <div class="timeline-dot ${item.done ? 'done' : item.active ? '' : 'pending'}"></div>
+      <div class="tl-title">${item.title}</div>
+      <div class="tl-date">${item.date}</div>
+      ${item.note ? `<div class="tl-note">${item.note}</div>` : ''}
+    </div>`).join('');
+
+  showPage('details', null);
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+document.getElementById('incidentDate').max = new Date().toISOString().split('T')[0];
+loadStats();
+</script>
+</body>
+</html>
